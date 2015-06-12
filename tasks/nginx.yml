@@ -5,13 +5,24 @@
   with_items:
    - nginx
 
+- name: Stop apache2
+  shell: service {{item}} stop
+  with_items:
+   - apache2
+
 - name: Disable default nginx config
   file: dest=/etc/nginx/sites-enabled/default state=absent
   register: nginx_default_config
 
-- name: Install/update nginx config for catsite
+- name: Install/update nginx config for DEVELOPMENT catsite
   copy: src=nginx-catsite dest=/etc/nginx/sites-enabled/catsite
   register: nginx_catsite_config
+  when: production != "yes"
+
+- name: Install/update nginx config for PRODUCTION catsite
+  copy: src=nginx-proxy dest=/etc/nginx/sites-enabled/catsite
+  register: nginx_catsite_config
+  when: production == "yes"
 
 - name: Reload nginx configuration
   shell: service nginx reload
@@ -19,3 +30,4 @@
 
 - name: Install/update catsite
   copy: src=catsite dest=/var/www/
+  

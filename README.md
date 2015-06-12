@@ -42,3 +42,39 @@ For example, for a machine with IP `52.0.228.95` and a username of `ubuntu`:
 * [nginx Documentation](http://nginx.org/en/docs/)
 * [Amazon Web Services Free Tier](http://aws.amazon.com/free/) - one way to
   test your work (other ways are totally fine)
+
+
+# Solution by Jean-Serge Gagnon:
+
+## I see multiple solutions:
+
+1. Add a parameter to ansible call such as production=cwyes|no and use that variable
+in the playbook to decide if reverse proxy should be set.
+2. Add a variable to the ansible inventory so that production machine has proxy set
+but others do not.
+3. Add a code in the playbook to setup the proxy on the production host based
+on it's hostname or domain.
+
+I have decided to implement #1 since I don't have multiple hosts to test with an
+inventory and don't have a real production system to test - this method will be
+the easiest to test in a sandbox environment like what I have here which is a KVM
+host with a single VM created with Ubuntu 14.04.2.
+
+## test process
+
+1. You will need a host which you can make changes to.
+   - I used a VM on KVM which I installed Ubuntu 14.04.2
+2. Revert and power up VM (second host)
+3. Test that non-production install works as expected:
+  a- run ansible playbook without production option:
+     ansible-playbook playbook.yml -i "plotly.fxos.com," --extra-vars="user=jsg" --extra-vars="production=no"
+  b- confirm you get expected page when visiting http://plotly.fxos.com/meow/
+     (i.e. not the production site)
+4. Test that production install works as expected:
+  a- run ansible playbook with production option
+     ansible-playbook playbook.yml -i "plotly.fxos.com," --extra-vars="user=jsg" --extra-vars="production=yes"
+  b- confirm you get expected page when visiting http://plotly.fxos.com/meow/
+     (i.e. the production site page)
+
+- There are many other ways to do this of course, but this was quick.
+

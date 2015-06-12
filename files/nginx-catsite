@@ -4,5 +4,5 @@ server {
   root /var/www/catsite;
   index index.html;
 
-  server_name cats.example.com;
+  server_name plotly.fxos.com;
 }
